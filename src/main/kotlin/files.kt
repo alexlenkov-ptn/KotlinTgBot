@@ -1,9 +1,9 @@
 import java.io.File
 
 data class Word(
-    val original : String,
-    val translate : String,
-    val correctAnswersCount : Int = 0,
+    val original: String,
+    val translate: String,
+    val correctAnswersCount: Int? = 0,
 )
 
 fun main() {
@@ -12,16 +12,12 @@ fun main() {
 
     for (string in wordsFile.readLines()) {
         val split = string.split("|")
-        try {
-            val word = Word(original = split[0],
-                translate = split[1],
-                correctAnswersCount = split[2].toInt())
-            dictionary.add(word)
-        }catch (e: Exception) {
-            val word = Word(original = split[0],
-                translate = split[1])
-            dictionary.add(word)
-        }
+        val word = Word(
+            original = split[0],
+            translate = split[1],
+            correctAnswersCount = split[2].toInt()
+        )
+        dictionary.add(word)
     }
 
     dictionary.map { println(it) }
