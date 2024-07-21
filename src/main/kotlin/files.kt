@@ -3,7 +3,7 @@ import java.io.File
 data class Word(
     val original: String,
     val translate: String,
-    val correctAnswersCount: Int? = 0,
+    val correctAnswersCount: Int = 0,
 )
 
 fun main() {
@@ -15,7 +15,7 @@ fun main() {
         val word = Word(
             original = split[0],
             translate = split[1],
-            correctAnswersCount = split[2].toInt()
+            correctAnswersCount = split.getOrNull(2)?.toIntOrNull() ?: 0
         )
         dictionary.add(word)
     }
