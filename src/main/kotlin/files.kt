@@ -1,5 +1,4 @@
 import java.io.File
-import kotlin.math.round
 
 data class Word(
     val original: String,
@@ -27,7 +26,7 @@ fun main() {
                     "2 – Статистика\n" +
                     "0 – Выход"
         )
-        val userInput = readln().toString()
+        val userInput = readln().toIntOrNull().toString()
         when (userInput) {
             "1" -> {
                 println("Учим слова")
@@ -37,7 +36,7 @@ fun main() {
             "2" -> {
                 println(
                     "Смотрим статистику\n" +
-                            dictionary.filter()
+                            dictionary.printStatistics()
                 )
                 break
             }
@@ -55,12 +54,11 @@ fun main() {
     }
 }
 
-fun MutableList<Word>.filter(): String {
+fun MutableList<Word>.printStatistics(): String {
     val allElements = this.count()
-    var correctAnswer = 0
-    this.map {
-        if (it.correctAnswersCount >= 3) correctAnswer++
-    }
+
+    val correctAnswer = (this.filter { it.correctAnswersCount >= 3 }).count()
+
     val percentResult = ((correctAnswer.toDouble() / allElements.toDouble()) * 100).toInt()
     return "Выучено $correctAnswer из $allElements слов | $percentResult%"
 }
