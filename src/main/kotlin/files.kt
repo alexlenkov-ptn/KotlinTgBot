@@ -1,5 +1,7 @@
 import java.io.File
 
+const val CORRECT_ANSWER = 3
+
 data class Word(
     val original: String,
     val translate: String,
@@ -19,7 +21,46 @@ fun main() {
         )
         dictionary.add(word)
     }
+    while (true) {
+        println(
+            "Меню: \n" +
+                    "1 – Учить слова\n" +
+                    "2 – Статистика\n" +
+                    "0 – Выход"
+        )
+        val userInput = readln().toIntOrNull()
+        when (userInput) {
+            1 -> {
+                println("Учим слова")
+                break
+            }
 
-    dictionary.map { println(it) }
+            2 -> {
+                println(
+                    "Смотрим статистику\n" +
+                            dictionary.printStatistics()
+                )
+                break
+            }
 
+            0 -> {
+                println("Выходим")
+                break
+            }
+
+            else -> {
+                println("Нажмите 1, 2 или 3")
+                continue
+            }
+        }
+    }
+}
+
+fun MutableList<Word>.printStatistics(): String {
+    val allElements = this.count()
+
+    val correctAnswer = this.filter { it.correctAnswersCount >= CORRECT_ANSWER }.count()
+
+    val percentResult = ((correctAnswer.toDouble() / allElements.toDouble()) * 100).toInt()
+    return "Выучено $correctAnswer из $allElements слов | $percentResult%"
 }
