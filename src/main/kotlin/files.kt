@@ -4,7 +4,6 @@ import java.io.File
 
 const val CORRECT_ANSWER = 3
 const val ANSWER_OPTIONS = 4
-const val ONE_WORD = 1
 
 data class Word(
     val original: String,
@@ -80,13 +79,19 @@ fun MutableList<Word>.printWords() {
         }
 
         while (unlearnedWords.count() < ANSWER_OPTIONS) {
-            unlearnedWords.add(this.filter { it.correctAnswersCount >= CORRECT_ANSWER }.random())
+            val randomWord = this.filter { it.correctAnswersCount >= CORRECT_ANSWER }.random()
+            while (!unlearnedWords.contains(randomWord)) {
+                unlearnedWords.add(randomWord)
+            }
         }
+
         // todo: Теперь сюда приходят не уникальные слова. Нужно сделать их уникальными
 
         val unlearnedWordsOptions = unlearnedWords.shuffled().take(ANSWER_OPTIONS)
+        val secretWord = unlearnedWordsOptions.filter { it.correctAnswersCount < ANSWER_OPTIONS }.random().original
+
         println(
-            "Загадываемое слово ${unlearnedWordsOptions.random().original} \n" +
+            "Загадываемое слово $secretWord \n" +
                     "Варианты ответа:"
         )
 
