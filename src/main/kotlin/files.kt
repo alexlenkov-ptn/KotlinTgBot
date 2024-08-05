@@ -65,30 +65,35 @@ fun MutableList<Word>.printStatistics(): String {
     val allElements = this.count()
 
     val correctAnswer = this.count { it.correctAnswersCount >= CORRECT_ANSWER }
-
     val percentResult = ((correctAnswer.toDouble() / allElements.toDouble()) * 100).toInt()
     return "Выучено $correctAnswer из $allElements слов | $percentResult%"
 }
 
 fun MutableList<Word>.printWords() {
     while (true) {
-        val unlearnedWords = this.filter { it.correctAnswersCount < CORRECT_ANSWER }
-        val unlearnedWordsOptions = unlearnedWords.shuffled().take(ANSWER_OPTIONS)
-        var options = 1
+        var unlearnedWords: MutableList<Word> = this.filter { it.correctAnswersCount < CORRECT_ANSWER }.toMutableList()
+
+
         if (unlearnedWords.isEmpty()) {
             println("Все слова выучены")
             break
-        } else {
-            println("Загадываемое слово ${unlearnedWordsOptions.take(ONE_WORD).map { it.original }}\n" +
-                    "Варианты ответа:")
-
-            unlearnedWordsOptions.shuffled().map {
-                println("$options. ${it.translate}")
-                options++
-            }
-
-            println("Напишите ответ: ")
-            val userInput = readln().toIntOrNull()
         }
+
+        while (unlearnedWords.count() < ANSWER_OPTIONS) {
+            unlearnedWords.add(this.filter { it.correctAnswersCount >= CORRECT_ANSWER }.random())
+        }
+        // todo: Теперь сюда приходят не уникальные слова. Нужно сделать их уникальными
+
+        val unlearnedWordsOptions = unlearnedWords.shuffled().take(ANSWER_OPTIONS)
+        println(
+            "Загадываемое слово ${unlearnedWordsOptions.random().original} \n" +
+                    "Варианты ответа:"
+        )
+
+        unlearnedWordsOptions.mapIndexed { index, word -> println("${index + 1}.${word.translate}") }
+
+
+        println("Напишите ответ: ")
+        val userInput = readln().toIntOrNull()
     }
 }
