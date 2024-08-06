@@ -85,8 +85,6 @@ fun MutableList<Word>.printWords() {
             }
         }
 
-        // todo: Теперь сюда приходят не уникальные слова. Нужно сделать их уникальными
-
         val unlearnedWordsOptions = unlearnedWords.shuffled().take(ANSWER_OPTIONS)
         val secretWord = unlearnedWordsOptions.filter { it.correctAnswersCount < ANSWER_OPTIONS }.random().original
 
