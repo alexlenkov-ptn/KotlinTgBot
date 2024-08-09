@@ -1,6 +1,9 @@
+@file:Suppress("UNUSED_CHANGED_VALUE")
+
 import java.io.File
 
 const val CORRECT_ANSWER = 3
+const val ANSWER_OPTIONS = 4
 
 data class Word(
     val original: String,
@@ -10,17 +13,19 @@ data class Word(
 
 fun main() {
     val wordsFile: File = File("words.txt")
-    val dictionary: MutableList<Word> = mutableListOf()
-
-    for (string in wordsFile.readLines()) {
-        val split = string.split("|")
-        val word = Word(
-            original = split[0],
-            translate = split[1],
-            correctAnswersCount = split.getOrNull(2)?.toIntOrNull() ?: 0
-        )
-        dictionary.add(word)
+    val dictionary = wordsFile.readLines().mapNotNull {
+        val split = it.split("|")
+        if (split.size >= 3) {
+            Word (original = split[0],
+                translate = split[1],
+                correctAnswersCount = split.getOrNull(2)?.toIntOrNull() ?: 0
+                )
+        } else {
+            null
+        }
     }
+
+
     while (true) {
         println(
             "Меню: \n" +
@@ -32,6 +37,7 @@ fun main() {
         when (userInput) {
             1 -> {
                 println("Учим слова")
+                dictionary.printWords()
                 break
             }
 
@@ -56,11 +62,43 @@ fun main() {
     }
 }
 
-fun MutableList<Word>.printStatistics(): String {
+fun List<Word>.printStatistics(): String {
     val allElements = this.count()
 
-    val correctAnswer = this.filter { it.correctAnswersCount >= CORRECT_ANSWER }.count()
-
+    val correctAnswer = this.count { it.correctAnswersCount >= CORRECT_ANSWER }
     val percentResult = ((correctAnswer.toDouble() / allElements.toDouble()) * 100).toInt()
     return "Выучено $correctAnswer из $allElements слов | $percentResult%"
+}
+
+fun List<Word>.printWords() {
+    while (true) {
+        var unlearnedWords: MutableList<Word> = this.filter { it.correctAnswersCount < CORRECT_ANSWER }.toMutableList()
+
+
+        if (unlearnedWords.isEmpty()) {
+            println("Все слова выучены")
+            break
+        }
+
+        while (unlearnedWords.count() < ANSWER_OPTIONS) {
+            val randomWord = this.filter { it.correctAnswersCount >= CORRECT_ANSWER }.random()
+            while (!unlearnedWords.contains(randomWord)) {
+                unlearnedWords.add(randomWord)
+            }
+        }
+
+        val unlearnedWordsOptions = unlearnedWords.shuffled().take(ANSWER_OPTIONS)
+        val secretWord = unlearnedWordsOptions.filter { it.correctAnswersCount < ANSWER_OPTIONS }.random().original
+
+        println(
+            "Загадываемое слово $secretWord \n" +
+                    "Варианты ответа:"
+        )
+
+        unlearnedWordsOptions.mapIndexed { index, word -> println("${index + 1}.${word.translate}") }
+
+
+        println("Напишите ответ: ")
+        val userInput = readln().toIntOrNull()
+    }
 }
