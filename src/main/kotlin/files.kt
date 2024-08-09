@@ -13,17 +13,19 @@ data class Word(
 
 fun main() {
     val wordsFile: File = File("words.txt")
-    val dictionary: MutableList<Word> = mutableListOf()
-
-    for (string in wordsFile.readLines()) {
-        val split = string.split("|")
-        val word = Word(
-            original = split[0],
-            translate = split[1],
-            correctAnswersCount = split.getOrNull(2)?.toIntOrNull() ?: 0
-        )
-        dictionary.add(word)
+    val dictionary = wordsFile.readLines().mapNotNull {
+        val split = it.split("|")
+        if (split.size >= 3) {
+            Word (original = split[0],
+                translate = split[1],
+                correctAnswersCount = split.getOrNull(2)?.toIntOrNull() ?: 0
+                )
+        } else {
+            null
+        }
     }
+
+
     while (true) {
         println(
             "Меню: \n" +
@@ -60,7 +62,7 @@ fun main() {
     }
 }
 
-fun MutableList<Word>.printStatistics(): String {
+fun List<Word>.printStatistics(): String {
     val allElements = this.count()
 
     val correctAnswer = this.count { it.correctAnswersCount >= CORRECT_ANSWER }
@@ -68,7 +70,7 @@ fun MutableList<Word>.printStatistics(): String {
     return "Выучено $correctAnswer из $allElements слов | $percentResult%"
 }
 
-fun MutableList<Word>.printWords() {
+fun List<Word>.printWords() {
     while (true) {
         var unlearnedWords: MutableList<Word> = this.filter { it.correctAnswersCount < CORRECT_ANSWER }.toMutableList()
 
