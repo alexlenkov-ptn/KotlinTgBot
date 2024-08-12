@@ -77,15 +77,10 @@ fun List<Word>.printStatistics(): String {
 }
 
 fun List<Word>.printWords() {
-    while (true) {
-        val unlearnedWords: MutableList<Word> =
-            this.filter { it.correctAnswersCount < INT_CORRECT_ANSWER }.toMutableList()
+    val unlearnedWords: MutableList<Word> =
+        this.filter { it.correctAnswersCount < INT_CORRECT_ANSWER }.toMutableList()
 
-        if (unlearnedWords.isEmpty()) {
-            println("Все слова выучены")
-            break
-        }
-
+    while (unlearnedWords.isNotEmpty()) {
         while (unlearnedWords.count() < INT_ANSWER_OPTIONS) {
             val randomWord = this.filter { it.correctAnswersCount == INT_CORRECT_ANSWER }.random()
             while (!unlearnedWords.contains(randomWord)) {
@@ -125,6 +120,7 @@ fun List<Word>.printWords() {
             println(STRING_INCORRECT_ANSWER)
         }
     }
+    println("Все слова выучены")
 }
 
 fun saveDictionary(file: File, dictionary: List<Word>) {
