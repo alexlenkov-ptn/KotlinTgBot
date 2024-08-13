@@ -93,7 +93,7 @@ fun List<Word>.printWords() {
 
         if (unlearnedWordsList.none { it.correctAnswersCount != INT_CORRECT_ANSWER }) {
             break
-        } // остановился тут
+        }
 
         val unlearnedWordsOptions = unlearnedWordsMutableList.shuffled().take(INT_ANSWER_OPTIONS)
 
@@ -112,10 +112,15 @@ fun List<Word>.printWords() {
                     "Напишите ответ: "
         )
 
-        val userInput = readln().toIntOrNull() ?: INT_MINUS_ONE
+        var userInput = readln().toIntOrNull() ?: INT_MINUS_ONE
 
         if (userInput == INT_NULL) {
             break
+        }
+
+        while (userInput == INT_MINUS_ONE) {
+            println("Введите число")
+            userInput = readln().toIntOrNull() ?: INT_MINUS_ONE
         }
 
         val answerUserWord = unlearnedWordsOptions.getOrNull(userInput.minus(INT_ONE))
