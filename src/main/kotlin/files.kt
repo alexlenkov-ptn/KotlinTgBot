@@ -77,22 +77,30 @@ fun List<Word>.printStatistics(): String {
 }
 
 fun List<Word>.printWords() {
-    val unlearnedWords: MutableList<Word> =
-        this.filter { it.correctAnswersCount < INT_CORRECT_ANSWER }.toMutableList()
 
-    while (unlearnedWords.isNotEmpty()) {
-        while (unlearnedWords.count() < INT_ANSWER_OPTIONS) {
-            val randomWord = this.filter { it.correctAnswersCount == INT_CORRECT_ANSWER }.random()
-            while (!unlearnedWords.contains(randomWord)) {
-                unlearnedWords.add(randomWord)
-            }
+    val unlearnedWordsList: List<Word> = this.filter { it.correctAnswersCount < INT_CORRECT_ANSWER }.toMutableList()
+
+    while (unlearnedWordsList.isNotEmpty()) {
+
+        val unlearnedWordsMutableList = unlearnedWordsList.toMutableList()
+
+        if (unlearnedWordsMutableList.count() < INT_ANSWER_OPTIONS) {
+            val missingAnswerCount = INT_ANSWER_OPTIONS.minus(unlearnedWordsMutableList.count())
+            val missingAnswerList: List<Word> =
+                this.shuffled().filter { it.correctAnswersCount == INT_CORRECT_ANSWER }.take(missingAnswerCount)
+            unlearnedWordsMutableList.addAll(missingAnswerList)
         }
 
-        val unlearnedWordsOptions = unlearnedWords.shuffled().take(INT_ANSWER_OPTIONS)
-        val secretWord = unlearnedWordsOptions.filter { it.correctAnswersCount < INT_CORRECT_ANSWER }.random().original
+        if (unlearnedWordsList.none { it.correctAnswersCount != INT_CORRECT_ANSWER }) {
+            break
+        } // остановился тут
+
+        val unlearnedWordsOptions = unlearnedWordsMutableList.shuffled().take(INT_ANSWER_OPTIONS)
+
+        val secretWord = unlearnedWordsOptions.filter { it.correctAnswersCount < INT_CORRECT_ANSWER }.random()
 
         println(
-            "Загадываемое слово: <$secretWord> \n" +
+            "Загадываемое слово: <${secretWord.original}> \n" +
                     "Варианты ответа:"
         )
 
@@ -112,7 +120,7 @@ fun List<Word>.printWords() {
 
         val answerUserWord = unlearnedWordsOptions.getOrNull(userInput.minus(INT_ONE))
 
-        if (secretWord == answerUserWord?.original) {
+        if (secretWord == answerUserWord) {
             answerUserWord.correctAnswersCount++
             println(STRING_CORRECT_ANSWER)
             saveDictionary(File("words.txt"), this)
