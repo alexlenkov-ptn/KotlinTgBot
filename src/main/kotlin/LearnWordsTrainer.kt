@@ -15,33 +15,7 @@ class LearnWordsTrainer {
 
     private var question: Question? = null
 
-    val dictionary = loadDictionary()
-
-    fun loadDictionary(): List<Word> {
-        val wordsFile: File = File("words.txt")
-        val dictionary: List<Word> = wordsFile.readLines().mapNotNull {
-            val split = it.split("|")
-            if (split.size >= 3) {
-                Word(
-                    original = split[0],
-                    translate = split[1],
-                    correctAnswersCount = split.getOrNull(2)?.toIntOrNull() ?: 0
-                )
-            } else {
-                null
-            }
-        }
-        return dictionary
-    }
-
-    fun saveDictionary(file: File, dictionary: List<Word>) {
-        file.writeText("")
-        dictionary.map {
-            file.appendText(
-                "${it.original}|${it.translate}|${it.correctAnswersCount}\n"
-            )
-        }
-    }
+    private val dictionary = loadDictionary()
 
     fun getStatistics(): Statistics {
         val allElements = dictionary.count()
@@ -51,7 +25,7 @@ class LearnWordsTrainer {
 
     }
 
-    fun getNextQuestion() : Question? {
+    fun getNextQuestion(): Question? {
 
         val unlearnedWordsList: List<Word> =
             dictionary.filter { it.correctAnswersCount < INT_MAX_CORRECT_ANSWER }.toMutableList()
@@ -79,16 +53,43 @@ class LearnWordsTrainer {
     }
 
     fun checkAnswer(userAnswerIndex: Int?): Boolean {
-        val correctAnswerId
-        if (correctAnswerId == userAnswerIndex) {
-            question.correctAnswer.correctAnswersCount++
-            println(STRING_CORRECT_ANSWER)
-            saveDictionary(File("words.txt"), dictionary)
-            return true
-        } else {
-            return false
-        }
+
+        return question?.let {
+            val correctAnswerId = it.variants.indexOf(it.correctAnswer)
+            if (correctAnswerId == userAnswerIndex) {
+                it.correctAnswer.correctAnswersCount++
+                saveDictionary(File("words.txt"), dictionary)
+                return true
+            } else {
+                return false
+            }
+        } ?: false
     }
 
+    private fun loadDictionary(): List<Word> {
+        val wordsFile: File = File("words.txt")
+        val dictionary: List<Word> = wordsFile.readLines().mapNotNull {
+            val split = it.split("|")
+            if (split.size >= 3) {
+                Word(
+                    original = split[0],
+                    translate = split[1],
+                    correctAnswersCount = split.getOrNull(2)?.toIntOrNull() ?: 0
+                )
+            } else {
+                null
+            }
+        }
+        return dictionary
+    }
+
+    private fun saveDictionary(file: File, dictionary: List<Word>) {
+        file.writeText("")
+        dictionary.map {
+            file.appendText(
+                "${it.original}|${it.translate}|${it.correctAnswersCount}\n"
+            )
+        }
+    }
 }
 
