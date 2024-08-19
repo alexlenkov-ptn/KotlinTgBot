@@ -16,6 +16,7 @@ fun main() {
 
             "2" -> {
                 println("Смотрим статистику")
+
                 break
             }
 
@@ -30,5 +31,12 @@ fun main() {
             }
         }
     }
-
+    fun MutableList<Word>.filter(): Int {
+        val allElements = this.count()
+        var correctAnswer = 0
+        this.map {
+            if (it.correctAnswersCount >= 3) correctAnswer++
+        }
+        return correctAnswer / allElements
+    }
 }
