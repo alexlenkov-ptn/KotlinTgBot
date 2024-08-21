@@ -18,7 +18,6 @@ fun Question.asConsoleString(): String {
         .mapIndexed { index, word -> "${index + 1}.${word.translate}" }
         .joinToString(separator = "\n")
     return this.correctAnswer.original + "\n" + variants + "\n0.Выйти в меню"
-
 }
 
 fun main() {
@@ -41,7 +40,7 @@ fun main() {
 
                     if (question == null) {
                         println("Все слова выучены")
-                        return break
+                        break
                     }
 
                     println(question.asConsoleString())
@@ -53,8 +52,8 @@ fun main() {
                     }
 
                     while (userInput == null) {
-                        println("Введите число")
-                        userInput = readln().toIntOrNull() ?: null
+                        println("Вы не ввели число. Введите число:")
+                        userInput = readln().toIntOrNull()
                     }
 
                     if (trainer.checkAnswer(userInput.minus(INT_ONE))) {

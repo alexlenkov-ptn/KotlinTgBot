@@ -15,7 +15,7 @@ class LearnWordsTrainer {
 
     private var question: Question? = null
 
-    private val dictionary = loadDictionary()
+    val dictionary = loadDictionary()
 
     fun getStatistics(): Statistics {
         val allElements = dictionary.count()
@@ -52,8 +52,7 @@ class LearnWordsTrainer {
         return question
     }
 
-    fun checkAnswer(userAnswerIndex: Int?): Boolean {
-
+    fun checkAnswer(userAnswerIndex: Int): Boolean {
         return question?.let {
             val correctAnswerId = it.variants.indexOf(it.correctAnswer)
             if (correctAnswerId == userAnswerIndex) {
