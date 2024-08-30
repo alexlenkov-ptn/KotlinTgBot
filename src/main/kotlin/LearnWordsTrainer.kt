@@ -18,7 +18,7 @@ class LearnWordsTrainer(
 
     private var question: Question? = null
 
-    val dictionary = loadDictionary()
+    private val dictionary = loadDictionary()
 
     fun getStatistics(): Statistics {
         val allElements = dictionary.count()
