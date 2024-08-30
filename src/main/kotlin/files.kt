@@ -1,5 +1,3 @@
-@file:Suppress("UNUSED_CHANGED_VALUE", "NAME_SHADOWING")
-
 const val INT_ZERO = 0
 const val INT_ONE = 1
 
