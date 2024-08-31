@@ -1,9 +1,3 @@
-@file:Suppress("UNUSED_CHANGED_VALUE")
-
-const val INT_MAX_CORRECT_ANSWER = 3
-const val INT_ANSWER_VARIANTS = 4
-const val STRING_CORRECT_ANSWER = "Ответ правильный"
-const val STRING_INCORRECT_ANSWER = "Ответ неправильный"
 const val INT_ZERO = 0
 const val INT_ONE = 1
 
@@ -23,7 +17,6 @@ fun Question.asConsoleString(): String {
 fun main() {
 
     val trainer = LearnWordsTrainer()
-    val dictionary = trainer.dictionary
 
     while (true) {
         println(
@@ -57,9 +50,9 @@ fun main() {
                     }
 
                     if (trainer.checkAnswer(userInput.minus(INT_ONE))) {
-                        println(STRING_CORRECT_ANSWER)
+                        println("Правильно!")
                     } else {
-                        println(STRING_INCORRECT_ANSWER)
+                        println("Неправильно! Правильный перевод: <${question.correctAnswer.translate}>")
                     }
                 }
             }
@@ -69,7 +62,7 @@ fun main() {
                 println(
                     "Выучено ${statistics.correctAnswer} из ${statistics.allElements} слов | ${statistics.percentResult}%"
                 )
-                break
+                continue
             }
 
             0 -> {
@@ -78,7 +71,7 @@ fun main() {
             }
 
             else -> {
-                println("Нажмите 1, 2 или 3")
+                println("Нажмите 1, 2 или 0")
                 continue
             }
         }
