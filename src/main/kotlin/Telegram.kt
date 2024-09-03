@@ -8,9 +8,7 @@ fun main(args: Array<String>) {
     val urlGetMe = "https://api.telegram.org/bot$botToken/getMe"
     val urlGetUpdates = "https://api.telegram.org/bot$botToken/getUpdates"
 
-
     val client: HttpClient = HttpClient.newBuilder().build()
-
 
     val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlGetUpdates)).build()
 
