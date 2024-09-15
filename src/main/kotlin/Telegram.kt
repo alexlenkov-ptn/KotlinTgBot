@@ -1,9 +1,9 @@
 import java.net.URI
+import java.net.URLEncoder
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-
-const val HOST_API_TELEGRAM = "https://api.telegram.org"
+import java.nio.charset.StandardCharsets
 
 fun main(args: Array<String>) {
     val botToken = args[0]
@@ -11,22 +11,40 @@ fun main(args: Array<String>) {
 
     while (true) {
         Thread.sleep(2000)
-        val updates: String = getUpdates(botToken, updateId)
+
+        val telegramBotService = TelegramBotService(botToken)
+
+        val updates: String = telegramBotService.getUpdates(updateId)
+
         println(updates)
 
-        val updateIdRegex: Regex = "\"update_id\":(.+?),".toRegex()
-        val matchResult: MatchResult? = updateIdRegex.find(updates)
-        val groups = matchResult?.groups
+        updateId = getUpdateId(updates)
 
-        updateId = (groups?.get(1)?.value?.toInt()?.plus(1)) ?: 0
+        val userMessage = getUserMessage(updates)
+
+        val chatId = getChatId(updates)
+
+        telegramBotService.sendMessage(chatId, userMessage)
     }
 }
 
-fun getUpdates(botToken: String, updateId: Int): String {
-    val urlGetUpdates = "$HOST_API_TELEGRAM/bot$botToken/getUpdates?offset=$updateId"
-    val client: HttpClient = HttpClient.newBuilder().build()
-    val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlGetUpdates)).build()
-    val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
+fun getUpdateId(updates : String): Int {
+    val updateIdRegex: Regex = "\"update_id\":(.+?),".toRegex()
+    val matchResult: MatchResult? = updateIdRegex.find(updates)
+    val groups = matchResult?.groups
+    return (groups?.get(1)?.value?.toInt()?.plus(1)) ?: 0
+}
 
-    return response.body()
+fun getChatId(updates: String): Int? {
+    val updateIdRegex : Regex = "\"id\":(.+?),".toRegex()
+    val matchResult : MatchResult? = updateIdRegex.find(updates)
+    val groups = matchResult?.groups
+    return groups?.get(1)?.value?.toInt() ?: 0
+}
+
+fun getUserMessage(updates : String) : String? {
+    val updateTextRegex : Regex = "\"text\":\"(.+?)\"".toRegex()
+    val matchResult : MatchResult? = updateTextRegex.find(updates)
+    val groups = matchResult?.groups
+    return groups?.get(1)?.value ?: ""
 }
