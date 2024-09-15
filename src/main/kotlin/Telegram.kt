@@ -1,10 +1,3 @@
-import java.net.URI
-import java.net.URLEncoder
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
-import java.nio.charset.StandardCharsets
-
 fun main(args: Array<String>) {
     val botToken = args[0]
     var updateId = 0
@@ -28,7 +21,7 @@ fun main(args: Array<String>) {
     }
 }
 
-fun getUpdateId(updates : String): Int {
+fun getUpdateId(updates: String): Int {
     val updateIdRegex: Regex = "\"update_id\":(.+?),".toRegex()
     val matchResult: MatchResult? = updateIdRegex.find(updates)
     val groups = matchResult?.groups
@@ -36,15 +29,15 @@ fun getUpdateId(updates : String): Int {
 }
 
 fun getChatId(updates: String): Int? {
-    val updateIdRegex : Regex = "\"id\":(.+?),".toRegex()
-    val matchResult : MatchResult? = updateIdRegex.find(updates)
+    val updateIdRegex: Regex = "\"id\":(.+?),".toRegex()
+    val matchResult: MatchResult? = updateIdRegex.find(updates)
     val groups = matchResult?.groups
     return groups?.get(1)?.value?.toInt() ?: 0
 }
 
-fun getUserMessage(updates : String) : String? {
-    val updateTextRegex : Regex = "\"text\":\"(.+?)\"".toRegex()
-    val matchResult : MatchResult? = updateTextRegex.find(updates)
+fun getUserMessage(updates: String): String? {
+    val updateTextRegex: Regex = "\"text\":\"(.+?)\"".toRegex()
+    val matchResult: MatchResult? = updateTextRegex.find(updates)
     val groups = matchResult?.groups
     return groups?.get(1)?.value ?: ""
 }

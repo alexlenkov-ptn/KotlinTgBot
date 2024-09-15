@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets
 
 const val HOST_API_TELEGRAM = "https://api.telegram.org"
 
-class TelegramBotService(private val botToken : String) {
+class TelegramBotService(private val botToken: String) {
 
     private val client: HttpClient = HttpClient.newBuilder().build()
 
