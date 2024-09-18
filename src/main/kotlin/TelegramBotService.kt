@@ -19,11 +19,43 @@ class TelegramBotService(private val botToken: String) {
     }
 
     fun sendMessage(chatId: Int?, text: String?): String? {
-        val encodedText = URLEncoder.encode(text, StandardCharsets.UTF_8.toString())
+        val encodedText = URLEncoder.encode(
+            text,
+            StandardCharsets.UTF_8.toString())
         val urlSendMessage = "$HOST_API_TELEGRAM/bot$botToken/sendMessage?chat_id=$chatId&text=$encodedText"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlSendMessage)).build()
         val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
         return response.body()
     }
 
+    fun sendMenu(chatId: Int?): String? {
+        val sendMenuBody = """
+            {
+            	"chat_id": $chatId,
+            	"text": "Основное меню",
+            	"reply_markup": {
+            		"inline_keyboard": [
+            			[
+            				{
+            					"text": "Изучить слова",
+            					"callback_data": "learn_words_clicked"
+            				},
+            				{
+            					"text": "Статистика",
+            					"callback_data": "statistics_clicked"
+            				}
+            			]
+            		]
+            	}
+            }
+        """.trimIndent()
+
+        val urlSendMessage = "$HOST_API_TELEGRAM/bot$botToken/sendMessage"
+        val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlSendMessage))
+            .header("Content-type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(sendMenuBody))
+            .build()
+        val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
+        return response.body()
+    }
 }
