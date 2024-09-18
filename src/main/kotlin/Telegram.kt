@@ -1,4 +1,5 @@
 const val STRING_MENU = "menu"
+const val STRING_START = "/start"
 
 fun main(args: Array<String>) {
     val botToken = args[0]
@@ -17,9 +18,11 @@ fun main(args: Array<String>) {
         val chatId = getChatId(updates)
         val callbackData = getData(updates)
 
-        if (userMessage?.lowercase() == STRING_MENU) {
+        if (userMessage?.lowercase() == STRING_START)
             telegramBotService.sendMenu(chatId)
-        }
+
+        if (userMessage?.lowercase() == STRING_MENU)
+            telegramBotService.sendMenu(chatId)
 
         if (callbackData?.lowercase() == "statistics_clicked" && chatId != null)
             telegramBotService.sendMessage(chatId, "Выучено 8 из 10 слов | 80%")

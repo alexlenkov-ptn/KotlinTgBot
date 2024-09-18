@@ -32,7 +32,7 @@ class TelegramBotService(private val botToken: String) {
         val sendMenuBody = """
             {
             	"chat_id": $chatId,
-            	"text": "Основное меню",
+            	"text": "Выберите действие",
             	"reply_markup": {
             		"inline_keyboard": [
             			[
