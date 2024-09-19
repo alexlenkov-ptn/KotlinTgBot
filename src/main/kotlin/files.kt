@@ -1,12 +1,6 @@
 const val INT_ZERO = 0
 const val INT_ONE = 1
 
-data class Word(
-    val original: String,
-    val translate: String,
-    var correctAnswersCount: Int = 0,
-)
-
 fun Question.asConsoleString(): String {
     val variants = this.variants
         .mapIndexed { index, word -> "${index + 1}.${word.translate}" }
