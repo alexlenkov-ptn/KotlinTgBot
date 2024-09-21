@@ -4,7 +4,7 @@ const val STRING_START = "/start"
 fun main(args: Array<String>) {
     val botToken = args[0]
     var updateId = 0
-    val trainer : LearnWordsTrainer
+    val trainer = LearnWordsTrainer()
 
     while (true) {
         Thread.sleep(2000)
@@ -24,9 +24,16 @@ fun main(args: Array<String>) {
         if (userMessage?.lowercase() == STRING_MENU)
             telegramBotService.sendMenu(chatId)
 
-        if (callbackData?.lowercase() == "statistics_clicked" && chatId != null)
-            telegramBotService.sendMessage(chatId, "Выучено 8 из 10 слов | 80%")
+        if (callbackData?.lowercase() == "statistics_clicked" && chatId != null) {
+            val statistics = trainer.getStatistics()
 
+            telegramBotService.sendMessage(
+                chatId,
+                "Выучено ${statistics.correctAnswer} из " +
+                        "${statistics.allElements} слов | " +
+                        "${statistics.percentResult}%"
+            )
+        }
     }
 }
 
@@ -36,7 +43,7 @@ fun getUpdateId(updates: String): Int {
 }
 
 fun getData(updates: String): String {
-    val dataRegex : Regex = "\"data\":\"(.+?)\"".toRegex()
+    val dataRegex: Regex = "\"data\":\"(.+?)\"".toRegex()
     return dataRegex.find(updates)?.groups?.get(1)?.value ?: ""
 }
 
