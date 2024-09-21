@@ -31,7 +31,6 @@ class LearnWordsTrainer(
         val correctAnswer = dictionary.count { it.correctAnswersCount >= learnedAnswerCount }
         val percentResult = ((correctAnswer.toDouble() / allElements.toDouble()) * 100).toInt()
         return Statistics(allElements, correctAnswer, percentResult)
-
     }
 
     fun getNextQuestion(): Question? {
