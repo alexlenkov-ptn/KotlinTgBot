@@ -18,21 +18,27 @@ fun main(args: Array<String>) {
         val chatId = getChatId(updates)
         val callbackData = getData(updates)
 
-        if (userMessage?.lowercase() == STRING_START)
+        if (userMessage.lowercase() == STRING_START)
             telegramBotService.sendMenu(chatId)
 
-        if (userMessage?.lowercase() == STRING_MENU)
+        if (userMessage.lowercase() == STRING_MENU)
             telegramBotService.sendMenu(chatId)
 
-        if (callbackData?.lowercase() == "statistics_clicked" && chatId != null) {
-            val statistics = trainer.getStatistics()
 
-            telegramBotService.sendMessage(
-                chatId,
-                "Выучено ${statistics.correctAnswer} из " +
-                        "${statistics.allElements} слов | " +
-                        "${statistics.percentResult}%"
-            )
+
+        when (callbackData.lowercase()) {
+            "learn_words_clicked" -> {
+                telegramBotService.checkNextQuestionAndSend(trainer, chatId)
+            }
+
+            "statistics_clicked" -> {
+                telegramBotService.sendMessage(
+                    chatId,
+                    "Выучено ${trainer.getStatistics().correctAnswer} из " +
+                            "${trainer.getStatistics().allElements} слов | " +
+                            "${trainer.getStatistics().percentResult}%"
+                )
+            }
         }
     }
 }
@@ -47,12 +53,12 @@ fun getData(updates: String): String {
     return dataRegex.find(updates)?.groups?.get(1)?.value ?: ""
 }
 
-fun getChatId(updates: String): Int? {
+fun getChatId(updates: String): Int {
     val updateIdRegex: Regex = "\"chat\":\\{\"id\":(\\d+)".toRegex()
     return updateIdRegex.find(updates)?.groups?.get(1)?.value?.toInt() ?: 0
 }
 
-fun getUserMessage(updates: String): String? {
+fun getUserMessage(updates: String): String {
     val updateTextRegex: Regex = "\"text\":\"(.+?)\"".toRegex()
     return updateTextRegex.find(updates)?.groups?.get(1)?.value ?: ""
 }
