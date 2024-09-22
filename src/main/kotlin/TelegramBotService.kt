@@ -109,4 +109,17 @@ class TelegramBotService(private val botToken: String) {
         val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
         return response.body()
     }
+
+    fun checkAnswer(callbackData: String, trainer: LearnWordsTrainer, chatId: Int?) {
+        if (callbackData.startsWith(CALLBACK_DATA_ANSWER_PREFIX)) {
+            val indexAnswer = callbackData.substringAfter(CALLBACK_DATA_ANSWER_PREFIX).toInt()
+            when(trainer.checkAnswer(indexAnswer)) {
+                true -> this.sendMessage(chatId,
+                    "Правильно!")
+                false -> this.sendMessage(chatId,
+                    "Неправильно! Корректный ответ: ${trainer.getNextQuestion()?.correctAnswer?.translate}")
+
+            }
+        }
+    }
 }

@@ -24,11 +24,9 @@ fun main(args: Array<String>) {
         if (userMessage.lowercase() == STRING_MENU)
             telegramBotService.sendMenu(chatId)
 
-
-
         when (callbackData.lowercase()) {
             "learn_words_clicked" -> {
-                telegramBotService.checkNextQuestionAndSend(trainer, chatId)
+                    telegramBotService.checkNextQuestionAndSend(trainer, chatId)
             }
 
             "statistics_clicked" -> {
@@ -40,6 +38,9 @@ fun main(args: Array<String>) {
                 )
             }
         }
+
+        telegramBotService.checkAnswer(callbackData, trainer, chatId)
+
     }
 }
 
