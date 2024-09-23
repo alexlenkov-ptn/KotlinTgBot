@@ -111,13 +111,15 @@ class TelegramBotService(private val botToken: String) {
     }
 
     fun checkAnswer(callbackData: String, trainer: LearnWordsTrainer, chatId: Int?) {
+
         if (callbackData.startsWith(CALLBACK_DATA_ANSWER_PREFIX)) {
             val indexAnswer = callbackData.substringAfter(CALLBACK_DATA_ANSWER_PREFIX).toInt()
+
             when(trainer.checkAnswer(indexAnswer)) {
                 true -> this.sendMessage(chatId,
                     "Правильно!")
                 false -> this.sendMessage(chatId,
-                    "Неправильно! Корректный ответ: ${trainer.getNextQuestion()?.correctAnswer?.translate}")
+                    "Неправильно! Корректный ответ: ${trainer.question?.correctAnswer?.translate}")
 
             }
         }

@@ -24,12 +24,12 @@ fun main(args: Array<String>) {
         if (userMessage.lowercase() == STRING_MENU)
             telegramBotService.sendMenu(chatId)
 
-        when (callbackData.lowercase()) {
-            "learn_words_clicked" -> {
-                    telegramBotService.checkNextQuestionAndSend(trainer, chatId)
+        when {
+            callbackData.lowercase() == "learn_words_clicked" -> {
+                telegramBotService.checkNextQuestionAndSend(trainer, chatId)
             }
 
-            "statistics_clicked" -> {
+            callbackData.lowercase() == "statistics_clicked" -> {
                 telegramBotService.sendMessage(
                     chatId,
                     "Выучено ${trainer.getStatistics().correctAnswer} из " +
@@ -37,10 +37,13 @@ fun main(args: Array<String>) {
                             "${trainer.getStatistics().percentResult}%"
                 )
             }
+
+            callbackData.startsWith(CALLBACK_DATA_ANSWER_PREFIX) -> {
+                telegramBotService.checkAnswer(callbackData, trainer, chatId)
+                telegramBotService.checkNextQuestionAndSend(trainer, chatId)
+            }
+
         }
-
-        telegramBotService.checkAnswer(callbackData, trainer, chatId)
-
     }
 }
 
