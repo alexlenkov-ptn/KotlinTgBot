@@ -1,6 +1,3 @@
-const val INT_ZERO = 0
-const val INT_ONE = 1
-
 fun Question.asConsoleString(): String {
     val variants = this.variants
         .mapIndexed { index, word -> "${index + 1}.${word.translate}" }
