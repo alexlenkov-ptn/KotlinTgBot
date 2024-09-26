@@ -1,68 +1,103 @@
-const val STRING_MENU = "menu"
-const val STRING_START = "/start"
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
+
+@Serializable
+data class Update(
+    @SerialName("update_id")
+    val updateId: Long,
+    @SerialName("message")
+    val message: Message? = null,
+    @SerialName("callback_query")
+    val callbackQuery: CallbackQuery? = null,
+)
+
+@Serializable
+data class Response(
+    @SerialName("result")
+    val result: List<Update>,
+)
+
+@Serializable
+data class CallbackQuery(
+    @SerialName("data")
+    val data: String? = null,
+    @SerialName("message")
+    val message: Message? = null,
+)
+
+@Serializable
+data class Message(
+    @SerialName("text")
+    val text: String,
+    @SerialName("chat")
+    val chat: Chat,
+)
+
+@Serializable
+data class Chat(
+    @SerialName("id")
+    val id: Long,
+)
+
 
 fun main(args: Array<String>) {
     val botToken = args[0]
-    var updateId = 0
+    var lastUpdateId = 0L
+
     val trainer = LearnWordsTrainer()
+
+    val json = Json {
+        ignoreUnknownKeys = true
+    }
 
     while (true) {
         Thread.sleep(2000)
+
         val telegramBotService = TelegramBotService(botToken)
-        val updates: String = telegramBotService.getUpdates(updateId)
+        val responseString: String = telegramBotService.getUpdates(lastUpdateId)
 
-        println(updates)
-        updateId = getUpdateId(updates)
+        val response: Response = json.decodeFromString(responseString)
+        val updates = response.result
+        val firstUpdate = updates.firstOrNull() ?: continue
+        val updateId = firstUpdate.updateId
+        lastUpdateId = updateId + 1
 
-        val userMessage = getUserMessage(updates)
-        val chatId = getChatId(updates)
-        val callbackData = getData(updates)
+        println(responseString)
 
-        if (userMessage.lowercase() == STRING_START)
-            telegramBotService.sendMenu(chatId)
+        val userMessage = firstUpdate.message?.text
+        val chatId = firstUpdate.message?.chat?.id ?: firstUpdate.callbackQuery?.message?.chat?.id
+        val callbackData = firstUpdate.callbackQuery?.data
 
-        if (userMessage.lowercase() == STRING_MENU)
-            telegramBotService.sendMenu(chatId)
+        if (userMessage?.lowercase() == Constants.STRING_START && chatId != null)
+            telegramBotService.sendMenu(json, chatId)
 
-        when {
-            callbackData.lowercase() == "learn_words_clicked" -> {
-                telegramBotService.checkNextQuestionAndSend(trainer, chatId)
+        if (userMessage?.lowercase() == Constants.STRING_MENU && chatId != null)
+            telegramBotService.sendMenu(json, chatId)
+
+        if (callbackData != null && chatId != null) {
+            when {
+                callbackData.lowercase() == Constants.CALLBACK_LEARN_WORDS_CLICKED -> {
+                    telegramBotService.checkNextQuestionAndSend(json, trainer, chatId)
+                }
+
+                callbackData.lowercase() == Constants.CALLBACK_STATISTICS_CLICKED -> {
+                    telegramBotService.sendMessage(
+                        json,
+                        chatId,
+                        "Выучено ${trainer.getStatistics().correctAnswer} из " +
+                                "${trainer.getStatistics().allElements} слов | " +
+                                "${trainer.getStatistics().percentResult}%"
+                    )
+                }
+
+                callbackData.startsWith(Constants.CALLBACK_DATA_ANSWER_PREFIX) -> {
+                    telegramBotService.checkAnswer(json, callbackData, trainer, chatId)
+                    telegramBotService.checkNextQuestionAndSend(json, trainer, chatId)
+                }
+
             }
-
-            callbackData.lowercase() == "statistics_clicked" -> {
-                telegramBotService.sendMessage(
-                    chatId,
-                    "Выучено ${trainer.getStatistics().correctAnswer} из " +
-                            "${trainer.getStatistics().allElements} слов | " +
-                            "${trainer.getStatistics().percentResult}%"
-                )
-            }
-
-            callbackData.startsWith(CALLBACK_DATA_ANSWER_PREFIX) -> {
-                telegramBotService.checkAnswer(callbackData, trainer, chatId)
-                telegramBotService.checkNextQuestionAndSend(trainer, chatId)
-            }
-
         }
     }
-}
-
-fun getUpdateId(updates: String): Int {
-    val updateIdRegex: Regex = "\"update_id\":(.+?),".toRegex()
-    return updateIdRegex.find(updates)?.groups?.get(1)?.value?.toInt()?.plus(1) ?: 0
-}
-
-fun getData(updates: String): String {
-    val dataRegex: Regex = "\"data\":\"(.+?)\"".toRegex()
-    return dataRegex.find(updates)?.groups?.get(1)?.value ?: ""
-}
-
-fun getChatId(updates: String): Int {
-    val updateIdRegex: Regex = "\"chat\":\\{\"id\":(\\d+)".toRegex()
-    return updateIdRegex.find(updates)?.groups?.get(1)?.value?.toInt() ?: 0
-}
-
-fun getUserMessage(updates: String): String {
-    val updateTextRegex: Regex = "\"text\":\"(.+?)\"".toRegex()
-    return updateTextRegex.find(updates)?.groups?.get(1)?.value ?: ""
 }
