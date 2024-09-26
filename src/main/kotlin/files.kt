@@ -1,6 +1,3 @@
-const val INT_ZERO = 0
-const val INT_ONE = 1
-
 fun Question.asConsoleString(): String {
     val variants = this.variants
         .mapIndexed { index, word -> "${index + 1}.${word.translate}" }
@@ -34,7 +31,7 @@ fun main() {
 
                     var userInput = readln().toIntOrNull()
 
-                    if (userInput == INT_ZERO) {
+                    if (userInput == Constants.INT_ZERO) {
                         break
                     }
 
@@ -43,7 +40,7 @@ fun main() {
                         userInput = readln().toIntOrNull()
                     }
 
-                    if (trainer.checkAnswer(userInput.minus(INT_ONE))) {
+                    if (trainer.checkAnswer(userInput.minus(Constants.INT_ONE))) {
                         println("Правильно!")
                     } else {
                         println("Неправильно! Правильный перевод: <${question.correctAnswer.translate}>")

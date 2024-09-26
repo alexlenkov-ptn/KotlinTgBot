@@ -1,5 +1,7 @@
 import java.io.File
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Word(
     val original: String,
     val translate: String,
@@ -22,7 +24,7 @@ class LearnWordsTrainer(
     private val countOfQuestionWords: Int = 4,
 ) {
 
-    private var question: Question? = null
+    var question: Question? = null
 
     private val dictionary = loadDictionary()
 
