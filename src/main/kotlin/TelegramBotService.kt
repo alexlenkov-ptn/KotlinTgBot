@@ -36,7 +36,7 @@ class TelegramBotService(private val botToken: String) {
     private val client: HttpClient = HttpClient.newBuilder().build()
 
     fun getUpdates(updateId: Long): String {
-        val urlGetUpdates = "$Constants.HOST_API_TELEGRAM/bot$botToken/getUpdates?offset=$updateId"
+        val urlGetUpdates = "${Constants.HOST_API_TELEGRAM}/bot$botToken/getUpdates?offset=$updateId"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlGetUpdates)).build()
         val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
         return response.body()
@@ -51,7 +51,7 @@ class TelegramBotService(private val botToken: String) {
 
         val requestBodyString = json.encodeToString(requestBody)
 
-        val urlSendMessage = "$Constants.HOST_API_TELEGRAM/bot$botToken/sendMessage"
+        val urlSendMessage = "${Constants.HOST_API_TELEGRAM}/bot$botToken/sendMessage"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlSendMessage))
             .header("Content-type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
@@ -99,7 +99,7 @@ class TelegramBotService(private val botToken: String) {
         val requestBodyString = json.encodeToString(requestBody)
 
 
-        val urlSendMessage = "$Constants.HOST_API_TELEGRAM/bot$botToken/sendMessage"
+        val urlSendMessage = "${Constants.HOST_API_TELEGRAM}/bot$botToken/sendMessage"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlSendMessage))
             .header("Content-type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
@@ -118,7 +118,7 @@ class TelegramBotService(private val botToken: String) {
                     question.variants.mapIndexed { index, word ->
                         InlineKeyboard(
                             text = word.translate,
-                            callbackData = "$Constants.CALLBACK_DATA_ANSWER_PREFIX$index",
+                            callbackData = "${Constants.CALLBACK_DATA_ANSWER_PREFIX}$index",
                         )
                     }
                 )
@@ -127,7 +127,7 @@ class TelegramBotService(private val botToken: String) {
 
         val requestBodyString = json.encodeToString(requestBody)
 
-        val urlSendMessage = "$Constants.HOST_API_TELEGRAM/bot$botToken/sendMessage"
+        val urlSendMessage = "${Constants.HOST_API_TELEGRAM}/bot$botToken/sendMessage"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlSendMessage))
             .header("Content-type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
