@@ -70,19 +70,19 @@ fun main(args: Array<String>) {
         val chatId = firstUpdate.message?.chat?.id ?: firstUpdate.callbackQuery?.message?.chat?.id
         val callbackData = firstUpdate.callbackQuery?.data
 
-        if (userMessage?.lowercase() == STRING_START && chatId != null)
+        if (userMessage?.lowercase() == Constants.STRING_START && chatId != null)
             telegramBotService.sendMenu(json, chatId)
 
-        if (userMessage?.lowercase() == STRING_MENU && chatId != null)
+        if (userMessage?.lowercase() == Constants.STRING_MENU && chatId != null)
             telegramBotService.sendMenu(json, chatId)
 
         if (callbackData != null && chatId != null) {
             when {
-                callbackData.lowercase() == CALLBACK_LEARN_WORDS_CLICKED -> {
+                callbackData.lowercase() == Constants.CALLBACK_LEARN_WORDS_CLICKED -> {
                     telegramBotService.checkNextQuestionAndSend(json, trainer, chatId)
                 }
 
-                callbackData.lowercase() == CALLBACK_STATISTICS_CLICKED -> {
+                callbackData.lowercase() == Constants.CALLBACK_STATISTICS_CLICKED -> {
                     telegramBotService.sendMessage(
                         json,
                         chatId,
@@ -92,7 +92,7 @@ fun main(args: Array<String>) {
                     )
                 }
 
-                callbackData.startsWith(CALLBACK_DATA_ANSWER_PREFIX) -> {
+                callbackData.startsWith(Constants.CALLBACK_DATA_ANSWER_PREFIX) -> {
                     telegramBotService.checkAnswer(json, callbackData, trainer, chatId)
                     telegramBotService.checkNextQuestionAndSend(json, trainer, chatId)
                 }

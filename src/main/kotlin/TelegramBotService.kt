@@ -36,7 +36,7 @@ class TelegramBotService(private val botToken: String) {
     private val client: HttpClient = HttpClient.newBuilder().build()
 
     fun getUpdates(updateId: Long): String {
-        val urlGetUpdates = "$HOST_API_TELEGRAM/bot$botToken/getUpdates?offset=$updateId"
+        val urlGetUpdates = "$Constants.HOST_API_TELEGRAM/bot$botToken/getUpdates?offset=$updateId"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlGetUpdates)).build()
         val response: HttpResponse<String> = client.send(request, HttpResponse.BodyHandlers.ofString())
         return response.body()
@@ -51,7 +51,7 @@ class TelegramBotService(private val botToken: String) {
 
         val requestBodyString = json.encodeToString(requestBody)
 
-        val urlSendMessage = "$HOST_API_TELEGRAM/bot$botToken/sendMessage"
+        val urlSendMessage = "$Constants.HOST_API_TELEGRAM/bot$botToken/sendMessage"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlSendMessage))
             .header("Content-type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
@@ -79,17 +79,17 @@ class TelegramBotService(private val botToken: String) {
 
         val requestBody = SendMessageRequest(
             chatId = chatId,
-            text = STRING_SELECT_ACTION,
+            text = Constants.STRING_SELECT_ACTION,
             replyMarkup = ReplyMarkup(
                 listOf(
                     listOf(
                         InlineKeyboard(
-                            text = STRING_LEARN_WORDS,
-                            callbackData = CALLBACK_LEARN_WORDS_CLICKED,
+                            text = Constants.STRING_LEARN_WORDS,
+                            callbackData = Constants.CALLBACK_LEARN_WORDS_CLICKED,
                         ),
                         InlineKeyboard(
-                            text = STRING_STATISTICS,
-                            callbackData = CALLBACK_STATISTICS_CLICKED,
+                            text = Constants.STRING_STATISTICS,
+                            callbackData = Constants.CALLBACK_STATISTICS_CLICKED,
                         ),
                     )
                 )
@@ -99,7 +99,7 @@ class TelegramBotService(private val botToken: String) {
         val requestBodyString = json.encodeToString(requestBody)
 
 
-        val urlSendMessage = "$HOST_API_TELEGRAM/bot$botToken/sendMessage"
+        val urlSendMessage = "$Constants.HOST_API_TELEGRAM/bot$botToken/sendMessage"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlSendMessage))
             .header("Content-type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
@@ -118,7 +118,7 @@ class TelegramBotService(private val botToken: String) {
                     question.variants.mapIndexed { index, word ->
                         InlineKeyboard(
                             text = word.translate,
-                            callbackData = "$CALLBACK_DATA_ANSWER_PREFIX$index",
+                            callbackData = "$Constants.CALLBACK_DATA_ANSWER_PREFIX$index",
                         )
                     }
                 )
@@ -127,7 +127,7 @@ class TelegramBotService(private val botToken: String) {
 
         val requestBodyString = json.encodeToString(requestBody)
 
-        val urlSendMessage = "$HOST_API_TELEGRAM/bot$botToken/sendMessage"
+        val urlSendMessage = "$Constants.HOST_API_TELEGRAM/bot$botToken/sendMessage"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlSendMessage))
             .header("Content-type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(requestBodyString))
@@ -138,8 +138,8 @@ class TelegramBotService(private val botToken: String) {
 
     fun checkAnswer(json: Json, callbackData: String, trainer: LearnWordsTrainer, chatId: Long) {
 
-        if (callbackData.startsWith(CALLBACK_DATA_ANSWER_PREFIX)) {
-            val indexAnswer = callbackData.substringAfter(CALLBACK_DATA_ANSWER_PREFIX).toInt()
+        if (callbackData.startsWith(Constants.CALLBACK_DATA_ANSWER_PREFIX)) {
+            val indexAnswer = callbackData.substringAfter(Constants.CALLBACK_DATA_ANSWER_PREFIX).toInt()
 
             when (trainer.checkAnswer(indexAnswer)) {
                 true -> this.sendMessage(
