@@ -91,6 +91,12 @@ class TelegramBotService(private val botToken: String) {
                             text = Constants.STRING_STATISTICS,
                             callbackData = Constants.CALLBACK_STATISTICS_CLICKED,
                         ),
+                    ),
+                    listOf(
+                        InlineKeyboard(
+                            text = Constants.STRING_RESET_CLICKED,
+                            callbackData = Constants.CALLBACK_RESET_CLICKED,
+                        )
                     )
                 )
             )

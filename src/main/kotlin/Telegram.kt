@@ -45,8 +45,7 @@ data class Chat(
 fun main(args: Array<String>) {
     val botToken = args[0]
     var lastUpdateId = 0L
-
-    val trainer = LearnWordsTrainer()
+    val trainers = HashMap<Long, LearnWordsTrainer>()
 
     val json = Json {
         ignoreUnknownKeys = true
@@ -59,45 +58,65 @@ fun main(args: Array<String>) {
         val responseString: String = telegramBotService.getUpdates(lastUpdateId)
 
         val response: Response = json.decodeFromString(responseString)
-        val updates = response.result
-        val firstUpdate = updates.firstOrNull() ?: continue
-        val updateId = firstUpdate.updateId
-        lastUpdateId = updateId + 1
+        if (response.result.isEmpty()) continue
 
-        println(responseString)
+        val sortedUpdates = response.result.sortedBy { it.updateId }
+        sortedUpdates.forEach { handleUpdate(it, json, telegramBotService, trainers) }
+        lastUpdateId = sortedUpdates.last().updateId + 1
 
-        val userMessage = firstUpdate.message?.text
-        val chatId = firstUpdate.message?.chat?.id ?: firstUpdate.callbackQuery?.message?.chat?.id
-        val callbackData = firstUpdate.callbackQuery?.data
+    }
+}
 
-        if (userMessage?.lowercase() == Constants.STRING_START && chatId != null)
-            telegramBotService.sendMenu(json, chatId)
+fun handleUpdate(
+    firstUpdate: Update,
+    json: Json,
+    telegramBotService: TelegramBotService,
+    trainer: HashMap<Long, LearnWordsTrainer>
+) {
 
-        if (userMessage?.lowercase() == Constants.STRING_MENU && chatId != null)
-            telegramBotService.sendMenu(json, chatId)
+    val userMessage = firstUpdate.message?.text
+    val chatId = firstUpdate.message?.chat?.id ?: firstUpdate.callbackQuery?.message?.chat?.id ?: return
+    val callbackData = firstUpdate.callbackQuery?.data
 
-        if (callbackData != null && chatId != null) {
-            when {
-                callbackData.lowercase() == Constants.CALLBACK_LEARN_WORDS_CLICKED -> {
-                    telegramBotService.checkNextQuestionAndSend(json, trainer, chatId)
-                }
+    val trainer = trainer.getOrPut(chatId) { LearnWordsTrainer("$chatId.txt") }
 
-                callbackData.lowercase() == Constants.CALLBACK_STATISTICS_CLICKED -> {
-                    telegramBotService.sendMessage(
-                        json,
-                        chatId,
-                        "Выучено ${trainer.getStatistics().correctAnswer} из " +
-                                "${trainer.getStatistics().allElements} слов | " +
-                                "${trainer.getStatistics().percentResult}%"
-                    )
-                }
+    if (userMessage?.lowercase() == Constants.STRING_START)
+        telegramBotService.sendMenu(json, chatId)
 
-                callbackData.startsWith(Constants.CALLBACK_DATA_ANSWER_PREFIX) -> {
-                    telegramBotService.checkAnswer(json, callbackData, trainer, chatId)
-                    telegramBotService.checkNextQuestionAndSend(json, trainer, chatId)
-                }
+    if (userMessage?.lowercase() == Constants.STRING_MENU)
+        telegramBotService.sendMenu(json, chatId)
 
+    if (callbackData != null) {
+        when {
+            callbackData.lowercase() == Constants.CALLBACK_LEARN_WORDS_CLICKED -> {
+                telegramBotService.checkNextQuestionAndSend(json, trainer, chatId)
             }
+
+            callbackData.lowercase() == Constants.CALLBACK_STATISTICS_CLICKED -> {
+                telegramBotService.sendMessage(
+                    json,
+                    chatId,
+                    "Выучено ${trainer.getStatistics().correctAnswer} из " +
+                            "${trainer.getStatistics().allElements} слов | " +
+                            "${trainer.getStatistics().percentResult}%"
+                )
+            }
+
+            callbackData.lowercase() == Constants.CALLBACK_RESET_CLICKED -> {
+                trainer.resetProgress()
+                telegramBotService.sendMessage(
+                    json,
+                    chatId,
+                    "Прогресс сброшен"
+                )
+                telegramBotService.sendMenu(json, chatId)
+            }
+
+            callbackData.startsWith(Constants.CALLBACK_DATA_ANSWER_PREFIX) -> {
+                telegramBotService.checkAnswer(json, callbackData, trainer, chatId)
+                telegramBotService.checkNextQuestionAndSend(json, trainer, chatId)
+            }
+
         }
     }
 }

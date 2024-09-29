@@ -20,6 +20,7 @@ data class Question(
 )
 
 class LearnWordsTrainer(
+    private val fileName: String = "words.txt",
     private val learnedAnswerCount: Int = 3,
     private val countOfQuestionWords: Int = 4,
 ) {
@@ -67,7 +68,7 @@ class LearnWordsTrainer(
             val correctAnswerId = it.variants.indexOf(it.correctAnswer)
             if (correctAnswerId == userAnswerIndex) {
                 it.correctAnswer.correctAnswersCount++
-                saveDictionary(File("words.txt"), dictionary)
+                saveDictionary()
                 return true
             } else {
                 return false
@@ -76,8 +77,11 @@ class LearnWordsTrainer(
     }
 
     private fun loadDictionary(): List<Word> {
-        val wordsFile: File = File("words.txt")
         try {
+            val wordsFile: File = File(fileName)
+            if (!wordsFile.exists()) {
+                File("words.txt").copyTo(wordsFile)
+            }
             val dictionary: List<Word> = wordsFile.readLines().map {
                 val split = it.split("|")
                 Word(
@@ -91,14 +95,22 @@ class LearnWordsTrainer(
             throw IllegalStateException("некорректный файл")
         }
     }
-}
 
-private fun saveDictionary(file: File, dictionary: List<Word>) {
-    file.writeText("")
-    dictionary.map {
-        file.appendText(
-            "${it.original}|${it.translate}|${it.correctAnswersCount}\n"
-        )
+    fun resetProgress() {
+        dictionary.forEach { it.correctAnswersCount = 0 }
+        saveDictionary()
+    }
+
+    private fun saveDictionary() {
+        val file = File(fileName)
+
+        dictionary.map {
+            file.appendText(
+                "${it.original}|${it.translate}|${it.correctAnswersCount}\n"
+            )
+        }
     }
 }
+
+
 
