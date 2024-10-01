@@ -47,19 +47,15 @@ fun main(args: Array<String>) {
     var lastUpdateId = 0L
     val trainers = HashMap<Long, LearnWordsTrainer>()
 
-    val json = Json {
-        ignoreUnknownKeys = true
-    }
-
     while (true) {
         Thread.sleep(2000)
 
         val telegramBotService = TelegramBotService(botToken)
 
         val responseString: String = telegramBotService.getUpdates(lastUpdateId)
-        val response: Response = json.decodeFromString(responseString)
-        if (response.result.isEmpty()) continue
+        val response: Response = telegramBotService.responseDecodeFromString(responseString)
 
+        if (response.result.isEmpty()) continue
         val sortedUpdates = response.result.sortedBy { it.updateId }
         sortedUpdates.forEach { handleUpdate(it, telegramBotService, trainers) }
         lastUpdateId = sortedUpdates.last().updateId + 1

@@ -39,6 +39,10 @@ class TelegramBotService(private val botToken: String) {
         ignoreUnknownKeys = true
     }
 
+    fun responseDecodeFromString(responseString: String): Response {
+        return json.decodeFromString(responseString)
+    }
+
     fun getUpdates(updateId: Long): String {
         val urlGetUpdates = "${Constants.HOST_API_TELEGRAM}/bot$botToken/getUpdates?offset=$updateId"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlGetUpdates)).build()
