@@ -145,7 +145,7 @@ class TelegramBotService(private val botToken: String) {
         return response.body()
     }
 
-    fun checkAnswer(json: Json, callbackData: String, trainer: LearnWordsTrainer, chatId: Long) {
+    fun checkAnswer(callbackData: String, trainer: LearnWordsTrainer, chatId: Long) {
 
         if (callbackData.startsWith(Constants.CALLBACK_DATA_ANSWER_PREFIX)) {
             val indexAnswer = callbackData.substringAfter(Constants.CALLBACK_DATA_ANSWER_PREFIX).toInt()

@@ -61,7 +61,7 @@ fun main(args: Array<String>) {
         if (response.result.isEmpty()) continue
 
         val sortedUpdates = response.result.sortedBy { it.updateId }
-        sortedUpdates.forEach { handleUpdate(it, json, telegramBotService, trainers) }
+        sortedUpdates.forEach { handleUpdate(it, telegramBotService, trainers) }
         lastUpdateId = sortedUpdates.last().updateId + 1
 
     }
@@ -69,7 +69,6 @@ fun main(args: Array<String>) {
 
 fun handleUpdate(
     firstUpdate: Update,
-    json: Json,
     telegramBotService: TelegramBotService,
     trainer: HashMap<Long, LearnWordsTrainer>
 ) {
@@ -111,7 +110,7 @@ fun handleUpdate(
             }
 
             callbackData.startsWith(Constants.CALLBACK_DATA_ANSWER_PREFIX) -> {
-                telegramBotService.checkAnswer(json, callbackData, trainer, chatId)
+                telegramBotService.checkAnswer(callbackData, trainer, chatId)
                 telegramBotService.checkNextQuestionAndSend(trainer, chatId)
             }
 
