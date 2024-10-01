@@ -55,8 +55,8 @@ fun main(args: Array<String>) {
         Thread.sleep(2000)
 
         val telegramBotService = TelegramBotService(botToken)
-        val responseString: String = telegramBotService.getUpdates(lastUpdateId)
 
+        val responseString: String = telegramBotService.getUpdates(lastUpdateId)
         val response: Response = json.decodeFromString(responseString)
         if (response.result.isEmpty()) continue
 
@@ -81,20 +81,19 @@ fun handleUpdate(
     val trainer = trainer.getOrPut(chatId) { LearnWordsTrainer("$chatId.txt") }
 
     if (userMessage?.lowercase() == Constants.STRING_START)
-        telegramBotService.sendMenu(json, chatId)
+        telegramBotService.sendMenu(chatId)
 
     if (userMessage?.lowercase() == Constants.STRING_MENU)
-        telegramBotService.sendMenu(json, chatId)
+        telegramBotService.sendMenu(chatId)
 
     if (callbackData != null) {
         when {
             callbackData.lowercase() == Constants.CALLBACK_LEARN_WORDS_CLICKED -> {
-                telegramBotService.checkNextQuestionAndSend(json, trainer, chatId)
+                telegramBotService.checkNextQuestionAndSend(trainer, chatId)
             }
 
             callbackData.lowercase() == Constants.CALLBACK_STATISTICS_CLICKED -> {
                 telegramBotService.sendMessage(
-                    json,
                     chatId,
                     "Выучено ${trainer.getStatistics().correctAnswer} из " +
                             "${trainer.getStatistics().allElements} слов | " +
@@ -105,16 +104,15 @@ fun handleUpdate(
             callbackData.lowercase() == Constants.CALLBACK_RESET_CLICKED -> {
                 trainer.resetProgress()
                 telegramBotService.sendMessage(
-                    json,
                     chatId,
                     "Прогресс сброшен"
                 )
-                telegramBotService.sendMenu(json, chatId)
+                telegramBotService.sendMenu(chatId)
             }
 
             callbackData.startsWith(Constants.CALLBACK_DATA_ANSWER_PREFIX) -> {
                 telegramBotService.checkAnswer(json, callbackData, trainer, chatId)
-                telegramBotService.checkNextQuestionAndSend(json, trainer, chatId)
+                telegramBotService.checkNextQuestionAndSend(trainer, chatId)
             }
 
         }

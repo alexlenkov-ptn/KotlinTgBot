@@ -35,6 +35,10 @@ class TelegramBotService(private val botToken: String) {
 
     private val client: HttpClient = HttpClient.newBuilder().build()
 
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
+
     fun getUpdates(updateId: Long): String {
         val urlGetUpdates = "${Constants.HOST_API_TELEGRAM}/bot$botToken/getUpdates?offset=$updateId"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlGetUpdates)).build()
@@ -42,7 +46,7 @@ class TelegramBotService(private val botToken: String) {
         return response.body()
     }
 
-    fun sendMessage(json: Json, chatId: Long, text: String): String? {
+    fun sendMessage(chatId: Long, text: String): String? {
 
         val requestBody = SendMessageRequest(
             chatId = chatId,
@@ -61,21 +65,20 @@ class TelegramBotService(private val botToken: String) {
     }
 
 
-    fun checkNextQuestionAndSend(json: Json, trainer: LearnWordsTrainer, chatId: Long) {
+    fun checkNextQuestionAndSend(trainer: LearnWordsTrainer, chatId: Long) {
         val question = trainer.getNextQuestion()
         if (question == null) {
             this.sendMessage(
-                json,
                 chatId,
                 "Все слова выучены"
             )
         } else {
-            this.sendQuestionWords(json, chatId, question)
+            this.sendQuestionWords(chatId, question)
         }
     }
 
 
-    fun sendMenu(json: Json, chatId: Long): String? {
+    fun sendMenu(chatId: Long): String? {
 
         val requestBody = SendMessageRequest(
             chatId = chatId,
@@ -114,7 +117,7 @@ class TelegramBotService(private val botToken: String) {
         return response.body()
     }
 
-    private fun sendQuestionWords(json: Json, chatId: Long, question: Question): String? {
+    private fun sendQuestionWords(chatId: Long, question: Question): String? {
 
         val requestBody = SendMessageRequest(
             chatId = chatId,
@@ -149,13 +152,11 @@ class TelegramBotService(private val botToken: String) {
 
             when (trainer.checkAnswer(indexAnswer)) {
                 true -> this.sendMessage(
-                    json,
                     chatId,
                     "Правильно!"
                 )
 
                 false -> this.sendMessage(
-                    json,
                     chatId,
                     "Неправильно! Корректный ответ: ${trainer.question?.correctAnswer?.translate}"
                 )
