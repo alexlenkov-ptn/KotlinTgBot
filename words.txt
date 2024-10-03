@@ -1,8 +1,8 @@
-hello|привет|3
-bye|пока|3
-good|хорошо|3
-cat|кошка|3
-apple|яблоко|2
-flowers|цветы|1
-potato|картошка|2
-bad|плохо|1
+hello|привет|0
+bye|пока|0
+good|хорошо|0
+cat|кошка|0
+apple|яблоко|0
+flowers|цветы|0
+potato|картошка|0
+bad|плохо|0
