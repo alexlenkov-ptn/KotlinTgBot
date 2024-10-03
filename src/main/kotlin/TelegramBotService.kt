@@ -35,6 +35,14 @@ class TelegramBotService(private val botToken: String) {
 
     private val client: HttpClient = HttpClient.newBuilder().build()
 
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
+
+    fun responseDecodeFromString(responseString: String): Response {
+        return json.decodeFromString(responseString)
+    }
+
     fun getUpdates(updateId: Long): String {
         val urlGetUpdates = "${Constants.HOST_API_TELEGRAM}/bot$botToken/getUpdates?offset=$updateId"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlGetUpdates)).build()
@@ -42,7 +50,7 @@ class TelegramBotService(private val botToken: String) {
         return response.body()
     }
 
-    fun sendMessage(json: Json, chatId: Long, text: String): String? {
+    fun sendMessage(chatId: Long, text: String): String? {
 
         val requestBody = SendMessageRequest(
             chatId = chatId,
@@ -61,21 +69,20 @@ class TelegramBotService(private val botToken: String) {
     }
 
 
-    fun checkNextQuestionAndSend(json: Json, trainer: LearnWordsTrainer, chatId: Long) {
+    fun checkNextQuestionAndSend(trainer: LearnWordsTrainer, chatId: Long) {
         val question = trainer.getNextQuestion()
         if (question == null) {
             this.sendMessage(
-                json,
                 chatId,
                 "Все слова выучены"
             )
         } else {
-            this.sendQuestionWords(json, chatId, question)
+            this.sendQuestionWords(chatId, question)
         }
     }
 
 
-    fun sendMenu(json: Json, chatId: Long): String? {
+    fun sendMenu(chatId: Long): String? {
 
         val requestBody = SendMessageRequest(
             chatId = chatId,
@@ -91,6 +98,12 @@ class TelegramBotService(private val botToken: String) {
                             text = Constants.STRING_STATISTICS,
                             callbackData = Constants.CALLBACK_STATISTICS_CLICKED,
                         ),
+                    ),
+                    listOf(
+                        InlineKeyboard(
+                            text = Constants.STRING_RESET_CLICKED,
+                            callbackData = Constants.CALLBACK_RESET_CLICKED,
+                        )
                     )
                 )
             )
@@ -98,7 +111,6 @@ class TelegramBotService(private val botToken: String) {
 
         val requestBodyString = json.encodeToString(requestBody)
 
-
         val urlSendMessage = "${Constants.HOST_API_TELEGRAM}/bot$botToken/sendMessage"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlSendMessage))
             .header("Content-type", "application/json")
@@ -108,21 +120,30 @@ class TelegramBotService(private val botToken: String) {
         return response.body()
     }
 
-    private fun sendQuestionWords(json: Json, chatId: Long, question: Question): String? {
+    private fun sendQuestionWords(chatId: Long, question: Question): String? {
+
+        val replyMarKupList = question.variants.mapIndexed { index, word ->
+            listOf(
+                InlineKeyboard(
+                    text = word.translate,
+                    callbackData = "${Constants.CALLBACK_DATA_ANSWER_PREFIX}$index",
+                )
+            )
+        }.toMutableList()
+
+        replyMarKupList.add(
+            listOf(
+                InlineKeyboard(
+                    text = Constants.STRING_EXIT_MENU,
+                    callbackData = Constants.CALLBACK_EXIT_MENU,
+                )
+            )
+        )
 
         val requestBody = SendMessageRequest(
             chatId = chatId,
             text = question.correctAnswer.original,
-            replyMarkup = ReplyMarkup(
-                listOf(
-                    question.variants.mapIndexed { index, word ->
-                        InlineKeyboard(
-                            text = word.translate,
-                            callbackData = "${Constants.CALLBACK_DATA_ANSWER_PREFIX}$index",
-                        )
-                    }
-                )
-            )
+            replyMarkup = ReplyMarkup(replyMarKupList)
         )
 
         val requestBodyString = json.encodeToString(requestBody)
@@ -136,20 +157,18 @@ class TelegramBotService(private val botToken: String) {
         return response.body()
     }
 
-    fun checkAnswer(json: Json, callbackData: String, trainer: LearnWordsTrainer, chatId: Long) {
+    fun checkAnswer(callbackData: String, trainer: LearnWordsTrainer, chatId: Long) {
 
         if (callbackData.startsWith(Constants.CALLBACK_DATA_ANSWER_PREFIX)) {
             val indexAnswer = callbackData.substringAfter(Constants.CALLBACK_DATA_ANSWER_PREFIX).toInt()
 
             when (trainer.checkAnswer(indexAnswer)) {
                 true -> this.sendMessage(
-                    json,
                     chatId,
                     "Правильно!"
                 )
 
                 false -> this.sendMessage(
-                    json,
                     chatId,
                     "Неправильно! Корректный ответ: ${trainer.question?.correctAnswer?.translate}"
                 )
