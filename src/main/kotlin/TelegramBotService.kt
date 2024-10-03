@@ -111,7 +111,6 @@ class TelegramBotService(private val botToken: String) {
 
         val requestBodyString = json.encodeToString(requestBody)
 
-
         val urlSendMessage = "${Constants.HOST_API_TELEGRAM}/bot$botToken/sendMessage"
         val request: HttpRequest = HttpRequest.newBuilder().uri(URI.create(urlSendMessage))
             .header("Content-type", "application/json")
