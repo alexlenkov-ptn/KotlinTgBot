@@ -20,7 +20,7 @@ data class Question(
 )
 
 class LearnWordsTrainer(
-    private val fileName: String = "words.txt",
+    private val fileName: String = Constants.WORDS_FILE_NAME,
     private val learnedAnswerCount: Int = 3,
     private val countOfQuestionWords: Int = 4,
 ) {
@@ -80,7 +80,7 @@ class LearnWordsTrainer(
         try {
             val wordsFile: File = File(fileName)
             if (!wordsFile.exists()) {
-                File("words.txt").copyTo(wordsFile)
+                File(Constants.WORDS_FILE_NAME).copyTo(wordsFile)
             }
             val dictionary: List<Word> = wordsFile.readLines().map {
                 val split = it.split("|")

@@ -16,6 +16,7 @@ object Constants {
     const val STRING_SELECT_ACTION = "Выберите действие"
     const val STRING_EXIT_MENU = "Выйти в меню"
     const val CALLBACK_EXIT_MENU = "exit_menu"
+    const val WORDS_FILE_NAME = "words.txt"
 }
 
 
