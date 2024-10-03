@@ -14,6 +14,8 @@ object Constants {
     const val STRING_STATISTICS = "Статистика"
     const val STRING_RESET_CLICKED = "Сбросить прогресс"
     const val STRING_SELECT_ACTION = "Выберите действие"
+    const val STRING_EXIT_MENU = "Выйти в меню"
+    const val CALLBACK_EXIT_MENU = "exit_menu"
 }
 
 
