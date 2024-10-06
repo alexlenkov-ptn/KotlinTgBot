@@ -13,14 +13,14 @@
 ### Настройка VPS
 
 1. Создать виртуальный сервер (Ubuntu), получить: ip-адрес, пароль для root пользователя
-2. Подключиться к серверу по SSH используя команду ssh root@100.100.100.100 и введя пароль
-3. Обновить установленные пакеты командами apt update и apt upgrade
-4. Устанавливаем JDK коммандой apt install default-jdk
-5. Убедиться что JDK установлена командой java --version
+2. Подключиться к серверу по SSH используя команду `ssh root@80.78.243.202` и введя пароль
+3. Обновить установленные пакеты командами `apt update` и `apt upgrade`
+4. Устанавливаем JDK коммандой `apt install default-jdk`
+5. Убедиться что JDK установлена командой `java --version`
 
 ### Публикация и запуск
 
-1. Соберем shadowJar командой ./gradlew shadowJar
+1. Соберем shadowJar командой `./gradlew shadowJar`
 2. Копируем jar на наш VPS переименуя его одновременно в bot.jar: scp build/libs/WordsTelegramBot-1.0-SNAPSHOT.jar root@100.100.100.100:/root/bot.jar
 3. Копируем words.txt на VPS: scp words.txt root@100.100.100.100:/root/words.txt
 4. Подключиться к серверу по SSH используя команду ssh root@100.100.100.100 и введя пароль
